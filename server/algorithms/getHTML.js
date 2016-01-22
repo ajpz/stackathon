@@ -1,10 +1,16 @@
 var http = require('http');
 var Promise = require('bluebird');
+var urlParser = require('url').parse;
 
-var getHtml = function(url, path) {
+var getHtml = function(href) {
+
+  var parsedUrl = urlParser(href),
+      host = parsedUrl.host,
+      path = parsedUrl.path || '/';
+
   if(!path) path = '/';
 
-  var options = { host: url, path: path, method: 'GET', headers: {Accept: "text/html"}};
+  var options = { host: host, path: path, method: 'GET', headers: {Accept: "text/html"}};
 
   return new Promise(function(resolve, reject) {
 
@@ -17,7 +23,7 @@ var getHtml = function(url, path) {
       });
 
       response.on('end', function(){
-        resolve(html);
+        resolve({ host: host, html: html });
       });
     });
 
