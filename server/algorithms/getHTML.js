@@ -1,9 +1,10 @@
 var http = require('http');
 var Promise = require('bluebird');
 
-var getHtml = function(url) {
+var getHtml = function(url, path) {
+  if(!path) path = '/';
 
-  var options = { host: url, path: '/', method: 'GET', headers: {Accept: "text/html"}};
+  var options = { host: url, path: path, method: 'GET', headers: {Accept: "text/html"}};
 
   return new Promise(function(resolve, reject) {
 
