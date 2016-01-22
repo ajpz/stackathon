@@ -17,15 +17,19 @@ var shortTestContent = "Hello hello, 123 45 object Object objects objective obje
 
 //
 var getWordFrequencyFromString = function(str) {
+    console.time('getWordFrequencyFromString')
+    str = str.replace(/[0-9]/g,'');
     var arrDirtyWords = tokenizer.tokenize(str.replace(/[^\w\s]/gi, ' '));
     var arrFilteredWords = filterStopWords(arrDirtyWords);
+    console.time('buildStemmerHash');
     var sHash = buildStemmerHash(arrFilteredWords);
-    //var rDict = buildReverseDict(arrFilteredWords);
-    //ENGLISH HASH NOT YET WORKING
+    console.timeEnd('buildStemmerHash');
+    console.time('buildEnglishHash');
     var englishHash = buildEnglishHash(arrFilteredWords);
+    console.timeEnd('buildEnglishHash');
     var sortedHash = sortByValue(englishHash);
-    console.log('\n\n\n',sortedHash);
-    console.log('done');
+    //console.log('\n\n\n',sortedHash);
+    console.timeEnd('getWordFrequencyFromString');
 };
 
 
@@ -87,7 +91,6 @@ var buildEnglishHash = function(arrWords) {
             stemmerHash[stemmed] = Number(1);
         }
     });
-    console.log('built reverse dict:');
     var englishHash = {}
     //loop through stemmed keys
     Object.keys(reverseDictionary).forEach(function(stemmer){
@@ -108,10 +111,9 @@ var buildEnglishHash = function(arrWords) {
 };
 
 var sortByValue = function (obj) {
-    //console.log(_.pairs(obj));
     return _.object(_.pairs(obj).sort(function(a, b) {
         return b[1] - a[1];
     }));
 };
 
-getWordFrequencyFromString(shortTestContent);
+getWordFrequencyFromString(testContent);
