@@ -26,3 +26,4 @@ function UrlNode(url, depth) {
 function SearchTree(node) {
     this.value = node;
 }
+
