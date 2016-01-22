@@ -18,10 +18,10 @@ var getWordFrequencyFromString = function(str) {
     var arrDirtyWords = tokenizer.tokenize(str.replace(/[^\w\s]/gi, ' '));
     var arrFilteredWords = filterStopWords(arrDirtyWords);
     var sHash = buildStemmerHash(arrFilteredWords);
+    //var rDict = buildReverseDict(arrFilteredWords);
     //ENGLISH HASH NOT YET WORKING
-    var englishHash = buildEnglishHash(sHash);
-    console.log(sHash);
-    console.log('DONE');
+    var englishHash = buildEnglishHash(arrFilteredWords);
+    console.log('done');
 };
 
 
@@ -34,9 +34,9 @@ var filterStopWords = function(arrTextToFilter) {
     });
 };
 
-//THIS IS BROKEN
+
 var buildStemmerHash = function(arrWords) {
-     var stemmerHash = {};
+    var stemmerHash = {};
     arrWords.forEach(function(word){
         var stemmed = natural.LancasterStemmer.stem(word.toLowerCase());
         //add to stemmerHash:
@@ -46,108 +46,67 @@ var buildStemmerHash = function(arrWords) {
     return stemmerHash;
 };
 
-
-//THIS IS BROKEN
-var buildReverseDict= function(stemmerHash) {
-   var reverseDictionary = {};
-    Object.keys(stemmerHash).forEach()function(stemmed) {
+var buildReverseDict = function(arrWords) {
+    var reverseDictionary = {};
+    arrWords.forEach(function(word){
+        var stemmed = natural.LancasterStemmer.stem(word.toLowerCase());
         //add to reverseDictionary:
         if (reverseDictionary.hasOwnProperty(stemmed)){
             var curArr = reverseDictionary[stemmed];
-            console.log(curArr);
             if (curArr.indexOf(word.toLowerCase()) === -1) {
                 curArr.push(word.toLowerCase());
             }
         }
         else {
-            console.log("puyshing ", [word.toLowerCase()])
             reverseDictionary[stemmed] = [word.toLowerCase()];
         }
     });
-    return stemmerHash;
+    return reverseDictionary;
 };
 
-//THIS IS BROKEN
-// var groupWords = function(arrWords) {
-//     arrWords.forEach(function(word){
-//         var stemmed = natural.LancasterStemmer.stem(word.toLowerCase());
-//         //add to stemmerHash:
-//         if (stemmerHash.hasOwnProperty(stemmed)) stemmerHash[stemmed] +=1;
-//         else stemmerHash[stemmed] = Number(1);
-
-//         //add to reverseDictionary:
-//         //console.log(reverseDictionary);
-//         if (reverseDictionary.hasOwnProperty(stemmed)){
-//             var curArr = reverseDictionary[stemmed];
-//             console.log(curArr);
-//             // if (curArr.indexOf(word.toLowerCase()) === -1) {
-//             //     curArr.push(word.toLowerCase());
-//             // }
-//         }
-//         else {
-//             console.log("puyshing ", [word.toLowerCase()])
-//             reverseDictionary[stemmed] = [word.toLowerCase()];
-//         }
-//     });
-//     return true;
-// };
-
-//MUST LOOP THROUGH REVERSE DICT HERE!!!!!!
-var buildEnglishHash = function() {
-    //loop through keys in stemmerHash.
+//combine StemmerHash and ReverseDict
+var buildEnglishHash = function(arrWords) {
+    var stemmerHash = {};
+    var reverseDictionary = {};
+    arrWords.forEach(function(word){
+        var stemmed = natural.LancasterStemmer.stem(word.toLowerCase());
+        //add to reverseDictionary:
+        if (reverseDictionary.hasOwnProperty(stemmed)){
+            var curArr = reverseDictionary[stemmed];
+            if (curArr.indexOf(word.toLowerCase()) === -1) {
+                curArr.push(word.toLowerCase());
+            }
+            stemmerHash[stemmed] +=1;
+        }
+        else {
+            reverseDictionary[stemmed] = [word.toLowerCase()];
+            stemmerHash[stemmed] = Number(1);
+        }
+    });
+    console.log('built reverse dict:');
+    console.log(reverseDictionary);
+    console.log(stemmerHash);
+    var englishHash = {}
+    //loop through stemmed keys
     Object.keys(reverseDictionary).forEach(function(stemmer){
         var bestmatch = "", distClosest = 0;
         //for each valuearr at key, generate array of {dist: word}
         for(var i = 0; i < reverseDictionary[stemmer].length; i ++) {
-            var curWord = reverseDictionary[stemmer];
+            var curWord = reverseDictionary[stemmer][i];
             var dist = natural.JaroWinklerDistance(stemmer, curWord);
             if (dist === 1) {
                 bestmatch = curWord;
+                console.log(dist, bestmatch, curWord)
                 break;
             }
             if (dist > distClosest) bestmatch = curWord;
         }
-        englishHash[curWord] = stemmerHash[stemmer];
+        englishHash[bestmatch] = stemmerHash[stemmer];
     });
     console.log("BUILT ENGLISH HASH!")
     console.log(englishHash);
-    return true;
-}
-
-
-//OLD:
-// var groupAndStem = function(arrWords) {
-//     var stemHash = {};
-//     arrWords.forEach(function(word){
-//         var stemmed = natural.LancasterStemmer.stem(word.toLowerCase());
-//         if (stemHash.hasOwnProperty(stemmed)) stemHash[stemmed] +=1;
-//         else stemHash[stemmed] = Number(1);
-//     });
-//     return stemHash;
-// };
-
-// var hashToStemmerHash = function (hash) {
-//     var stemmerHash = {};
-
-//     //loop through properties of hash and create a new hash with unique properties
-//     for (var prop in hash) {
-//         if (hash.hasOwnProperty(prop)) {
-//             //run through stemmer and add to stemmer hash
-//             var word = natural.PorterStemmer.stem(prop);
-//             console.log(word);
-//             if(stemmerHash.hasOwnProperty(word)) {
-//                 console.log(stemmerHash[word]);
-//                 stemmerHash[word] +=1;
-//                 console.log('FOUND ', word, stemmerHash[word]);
-//             }
-//             else {
-//                 console.log("NOT FOUND ", word)
-//                 stemmerHash[word] = Number(1);
-//             }
-//         }
-//     }
-//     return stemmerHash;
-// };
+    return englishHash;
+};
 
 // var sortByValue = function (obj) {
 //     return Object.keys(obj).sort(function(a,b) {
