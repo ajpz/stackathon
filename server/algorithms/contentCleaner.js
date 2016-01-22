@@ -8,6 +8,8 @@ Returns object of word: count pairs.
 var natural = require('natural');
 var tokenizer = new natural.TreebankWordTokenizer();
 var wordsToIgnore = require ('./dictionary.js').stopwords;
+
+
 var testContent = "Macbeth is Shakespeare's shortest tragedy, and tells the story of a brave Scottish general named Macbeth who receives a prophecy from a trio of witches that one day he will become King of Scotland.Consumed by ambition and spurred to action by his wife, Macbeth murders King Duncan and takes the throne for himself. He is then wracked with guilt and paranoia, and he soon becomes a tyrannical ruler as he is forced to commit more and more murders to protect himself from enmity and suspicion.The bloodbath and consequent civil war swiftly take Macbeth and Lady Macbeth into the realms of arrogance, madness, and death.Shakespeare's source for the tragedy is the account of Macbeth, King of Scotland, Macduff, and Duncan in Holinshed's Chronicles (1587), a history of England, Scotland, and Ireland familiar to Shakespeare and his contemporaries, although the events in the play differ extensively from the history of the real Macbeth. In recent scholarship, the events of the tragedy are usually associated more closely with the execution of Henry Garnett for complicity in the Gunpowder Plot of 1605.[1]";
 
 var shortTestContent = "Hello hello, hi hi hi object Object objects objective objectify objectified";
@@ -15,9 +17,11 @@ var shortTestContent = "Hello hello, hi hi hi object Object objects objective ob
 var getWordFrequencyFromString = function(str) {
     var arrDirtyWords = tokenizer.tokenize(str.replace(/[^\w\s]/gi, ' '));
     var arrFilteredWords = filterStopWords(arrDirtyWords);
-    var result = groupAndStem(arrFilteredWords);
-    //todo: use string distance to find closest 'real word'
-    console.log(result);
+    var sHash = buildStemmerHash(arrFilteredWords);
+    //ENGLISH HASH NOT YET WORKING
+    var englishHash = buildEnglishHash(sHash);
+    console.log(sHash);
+    console.log('DONE');
 };
 
 
@@ -30,20 +34,97 @@ var filterStopWords = function(arrTextToFilter) {
     });
 };
 
-// //take content from website and turn into an array of words. Remove whitespace and special characters.
-// var removeWhitespaceFromString = function (str) {
-//     return str.replace(/[^\w\s]/gi, '').split(' ');
-// };
-
-var groupAndStem = function(arrWords) {
-    var groupHash = {};
+//THIS IS BROKEN
+var buildStemmerHash = function(arrWords) {
+     var stemmerHash = {};
     arrWords.forEach(function(word){
         var stemmed = natural.LancasterStemmer.stem(word.toLowerCase());
-        if (groupHash.hasOwnProperty(stemmed)) groupHash[stemmed] +=1;
-        else groupHash[stemmed] = Number(1);
+        //add to stemmerHash:
+        if (stemmerHash.hasOwnProperty(stemmed)) stemmerHash[stemmed] +=1;
+        else stemmerHash[stemmed] = Number(1);
     });
-    return groupHash;
+    return stemmerHash;
 };
+
+
+//THIS IS BROKEN
+var buildReverseDict= function(stemmerHash) {
+   var reverseDictionary = {};
+    Object.keys(stemmerHash).forEach()function(stemmed) {
+        //add to reverseDictionary:
+        if (reverseDictionary.hasOwnProperty(stemmed)){
+            var curArr = reverseDictionary[stemmed];
+            console.log(curArr);
+            if (curArr.indexOf(word.toLowerCase()) === -1) {
+                curArr.push(word.toLowerCase());
+            }
+        }
+        else {
+            console.log("puyshing ", [word.toLowerCase()])
+            reverseDictionary[stemmed] = [word.toLowerCase()];
+        }
+    });
+    return stemmerHash;
+};
+
+//THIS IS BROKEN
+// var groupWords = function(arrWords) {
+//     arrWords.forEach(function(word){
+//         var stemmed = natural.LancasterStemmer.stem(word.toLowerCase());
+//         //add to stemmerHash:
+//         if (stemmerHash.hasOwnProperty(stemmed)) stemmerHash[stemmed] +=1;
+//         else stemmerHash[stemmed] = Number(1);
+
+//         //add to reverseDictionary:
+//         //console.log(reverseDictionary);
+//         if (reverseDictionary.hasOwnProperty(stemmed)){
+//             var curArr = reverseDictionary[stemmed];
+//             console.log(curArr);
+//             // if (curArr.indexOf(word.toLowerCase()) === -1) {
+//             //     curArr.push(word.toLowerCase());
+//             // }
+//         }
+//         else {
+//             console.log("puyshing ", [word.toLowerCase()])
+//             reverseDictionary[stemmed] = [word.toLowerCase()];
+//         }
+//     });
+//     return true;
+// };
+
+//MUST LOOP THROUGH REVERSE DICT HERE!!!!!!
+var buildEnglishHash = function() {
+    //loop through keys in stemmerHash.
+    Object.keys(reverseDictionary).forEach(function(stemmer){
+        var bestmatch = "", distClosest = 0;
+        //for each valuearr at key, generate array of {dist: word}
+        for(var i = 0; i < reverseDictionary[stemmer].length; i ++) {
+            var curWord = reverseDictionary[stemmer];
+            var dist = natural.JaroWinklerDistance(stemmer, curWord);
+            if (dist === 1) {
+                bestmatch = curWord;
+                break;
+            }
+            if (dist > distClosest) bestmatch = curWord;
+        }
+        englishHash[curWord] = stemmerHash[stemmer];
+    });
+    console.log("BUILT ENGLISH HASH!")
+    console.log(englishHash);
+    return true;
+}
+
+
+//OLD:
+// var groupAndStem = function(arrWords) {
+//     var stemHash = {};
+//     arrWords.forEach(function(word){
+//         var stemmed = natural.LancasterStemmer.stem(word.toLowerCase());
+//         if (stemHash.hasOwnProperty(stemmed)) stemHash[stemmed] +=1;
+//         else stemHash[stemmed] = Number(1);
+//     });
+//     return stemHash;
+// };
 
 // var hashToStemmerHash = function (hash) {
 //     var stemmerHash = {};
@@ -81,4 +162,4 @@ var groupAndStem = function(arrWords) {
 //     });
 // };
 
-getWordFrequencyFromString(testContent);
+getWordFrequencyFromString(shortTestContent);
