@@ -1,6 +1,7 @@
 var Promise = require('bluebird');
 var _ = require('lodash');
-var linkParser = require('./linkParser.js');
+var getObjectData = require('./scripts/objectFromUrl.js');
+//var linkParser = require('./scripts/linkParser.js');
 /*
 
 helperFunc, createNode()
@@ -26,7 +27,7 @@ function UrlNode(url, depth) { //removed 3rd param: parentNode to try and limit 
     this.depth = depth;
     this.url = url;
     // this.parentNode = parentNode || null;
-    //this.html = function....
+    this.keywords = {};
     this.childNodes = [];
 };
 
@@ -38,38 +39,69 @@ UrlNode.prototype.prettyPrint = function()
         depthStr +='--';
         i++;
     }
-    console.log(depthStr + this.url + ',#Children:' + this.childNodes.length);
-
-    for (i = 0; i < this.childNodes.length; i++) {
-        this.childNodes[i].prettyPrint();   //use prettyPrint for debugging tree
+    console.log(depthStr + this.url + ',#Children:' + (this.childNodes ? this.childNodes.length : 0));
+    if(this.childNodes) {
+        for (i = 0; i < this.childNodes.length; i++) {
+            this.childNodes[i].prettyPrint();   //use prettyPrint for debugging tree
+        }
     }
 }
 
+// var crawlLinkRecursive = function(parentNode) {
+//     return linkParser(parentNode.url)
+//     .map(function(link) {
+//         var newNode = new UrlNode(link, parentNode.depth + 1);
+//         if(newNode.depth < MAX_DEPTH) {
+//             return crawlLinkRecursive(newNode).then(function(childNodes) {
+//                 newNode.childNodes = childNodes;
+//                 return newNode;
+//             }).catch(function(err) {
+//                 newNode.childNodes = [];
+//                 return newNode;
+//             });
+//         }
+//         return newNode;
+//     })
+// }
+
+//might want to rewrite this to be breadth first, and then render level by level
 var crawlLinkRecursive = function(parentNode) {
-    return linkParser(parentNode.url)
-    .map(function(link) {
-        var newNode = new UrlNode(link, parentNode.depth + 1);
-        if(newNode.depth < MAX_DEPTH) {
-            return crawlLinkRecursive(newNode).then(function(childNodes) {
-                newNode.childNodes = childNodes;
-                return newNode;
-            }).catch(function(err) {
-                newNode.childNodes = [];
+    //async: gets html from url and extracts keywords and childlinks
+    return getObjectData(parentNode.url, 10)
+    .then(function(urlData){
+        //now we have keywords and childurls for this node.
+        parentNode.keywords = urlData.keywords;
+        //then, for each link, do the same
+        console.log(parentNode.keywords);
+        console.log(urlData.childurls[0]);
+        if(urlData.childurls) {
+            urlData.childurls
+            .map(function(link) {
+                var newNode = new UrlNode(link, parentNode.depth + 1);
+                if(newNode.depth < MAX_DEPTH) {
+                    return crawlLinkRecursive(newNode).then(function(childNodes) {
+                        newNode.childNodes = childNodes;
+                        return newNode;
+                    }).catch(function(err) {
+                        newNode.childNodes = [];
+                        return newNode;
+                    });
+                }
                 return newNode;
             });
         }
-        return newNode;
-    })
+    });
 }
 
 //for testing - uncomment this....
-// var testUrl: 'http://blog.miguelgrinberg.com/post/easy-web-scraping-with-nodejs';
-// var headNode = new UrlNode(testUrl, 0);
-// crawlLinkRecursive(headNode).then(function(arrayOfChildNodes) {
-//     headNode.childNodes = arrayOfChildNodes
-//     console.log('\n\n\n\n\n\nDONEDONEDONE');
-//     headNode.prettyPrint();
-// })
+var testUrl = 'http://blog.miguelgrinberg.com/post/easy-web-scraping-with-nodejs';
+var headNode = new UrlNode(testUrl, 0);
+crawlLinkRecursive(headNode).then(function(arrayOfChildNodes) {
+    headNode.childNodes = arrayOfChildNodes
+    console.log('\n\n\n\n\n\nDONEDONEDONE');
+    console.log(headNode);
+    //headNode.prettyPrint();
+})
 
 module.exports = function(url) {
   var headNode = new UrlNode(url, 0);
