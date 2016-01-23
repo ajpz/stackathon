@@ -41,7 +41,7 @@ UrlNode.prototype.prettyPrint = function()
     console.log(depthStr + this.url + ',#Children:' + this.childNodes.length);
 
     for (i = 0; i < this.childNodes.length; i++) {
-        this.childNodes[i].prettyPrint();
+        this.childNodes[i].prettyPrint();   //use prettyPrint for debugging tree
     }
 }
 

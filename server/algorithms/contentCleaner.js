@@ -116,4 +116,8 @@ var sortByValue = function (obj) {
     }));
 };
 
-getWordFrequencyFromString(testContent);
+//getWordFrequencyFromString(testContent);
+
+module.exports = function(str) {
+    getWordFrequencyFromString(str);
+};
