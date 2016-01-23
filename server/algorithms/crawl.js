@@ -72,20 +72,24 @@ var crawlLinkRecursive = function(parentNode) {
         //now we have keywords and childurls for this node.
         parentNode.keywords = urlData.keywords;
         //then, for each link, do the same
-        urlData.childurls
-        .map(function(link) {
-            var newNode = new UrlNode(link, parentNode.depth + 1);
-            if(newNode.depth < MAX_DEPTH) {
-                return crawlLinkRecursive(newNode).then(function(childNodes) {
-                    newNode.childNodes = childNodes;
-                    return newNode;
-                }).catch(function(err) {
-                    newNode.childNodes = [];
-                    return newNode;
-                });
-            }
-            return newNode;
-        });
+        console.log(parentNode.keywords);
+        console.log(urlData.childurls[0]);
+        if(urlData.childurls) {
+            urlData.childurls
+            .map(function(link) {
+                var newNode = new UrlNode(link, parentNode.depth + 1);
+                if(newNode.depth < MAX_DEPTH) {
+                    return crawlLinkRecursive(newNode).then(function(childNodes) {
+                        newNode.childNodes = childNodes;
+                        return newNode;
+                    }).catch(function(err) {
+                        newNode.childNodes = [];
+                        return newNode;
+                    });
+                }
+                return newNode;
+            });
+        }
     });
 }
 
@@ -95,7 +99,8 @@ var headNode = new UrlNode(testUrl, 0);
 crawlLinkRecursive(headNode).then(function(arrayOfChildNodes) {
     headNode.childNodes = arrayOfChildNodes
     console.log('\n\n\n\n\n\nDONEDONEDONE');
-    headNode.prettyPrint();
+    console.log(headNode);
+    //headNode.prettyPrint();
 })
 
 module.exports = function(url) {
