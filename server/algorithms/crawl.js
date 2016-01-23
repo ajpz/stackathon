@@ -19,12 +19,13 @@ until n-deep is reached on each branch
 returns tree ---> to front end
 */
 
-var maxDepth = 2;
+var MAX_DEPTH = 3;
 
-function UrlNode(url, depth, parentNode) {
+
+function UrlNode(url, depth) { //removed 3rd param: parentNode to try and limit circular error
     this.depth = depth;
     this.url = url;
-    this.parentNode = parentNode || null;
+    // this.parentNode = parentNode || null;
     //this.html = function....
     this.childNodes = [];
 };
@@ -37,7 +38,6 @@ UrlNode.prototype.prettyPrint = function()
         depthStr +='--';
         i++;
     }
-    //console.log(depthStr + "{url: " + this.url + "\ndepth:" + this.depth + "}");
     console.log(depthStr + this.url + ',#Children:' + this.childNodes.length);
 
     for (i = 0; i < this.childNodes.length; i++) {
@@ -45,34 +45,11 @@ UrlNode.prototype.prettyPrint = function()
     }
 }
 
-var headNode = new UrlNode('http://blog.miguelgrinberg.com/post/easy-web-scraping-with-nodejs', 0);
-
-//depth-first:
-//this function should return a promise!
-// var crawlLinkRecursive = function(parentNode) {
-//     //var thisNode = new UrlNode(parentNode.url, parentNode.depth +);
-//     console.log('parentNode',parentNode.url);
-//     return linkParser(parentNode.url)
-//     .then(function(links) {
-//         //.map is a Promise method here:
-//         parentNode.childNodes = links.map(function(link) {
-//             //recursively create nodes:
-//             var thisNode = new UrlNode(link, parentNode.depth +1);
-//             thisNode.parentNode = parentNode;
-//             //find all children:
-//             if (thisNode.depth < maxDepth) thiscrawlLinkRecursive(thisNode);
-//             console.log('done');
-//             return thisNode;
-//         });
-//     });
-// }
-
 var crawlLinkRecursive = function(parentNode) {
     return linkParser(parentNode.url)
     .map(function(link) {
-        //console.log('child: ', link);
-        var newNode = new UrlNode(link, parentNode.depth + 1, parentNode);
-        if(newNode.depth < maxDepth) {
+        var newNode = new UrlNode(link, parentNode.depth + 1);
+        if(newNode.depth < MAX_DEPTH) {
             return crawlLinkRecursive(newNode).then(function(childNodes) {
                 newNode.childNodes = childNodes;
                 return newNode;
@@ -85,13 +62,25 @@ var crawlLinkRecursive = function(parentNode) {
     })
 }
 
-// linkParser(headNode.url).then(function(links){
-//     console.log("LINKS");
-//     console.log(links);
-// });
-crawlLinkRecursive(headNode).then(function(arrayOfChildNodes) {
+//for testing - uncomment this....
+// var testUrl: 'http://blog.miguelgrinberg.com/post/easy-web-scraping-with-nodejs';
+// var headNode = new UrlNode(testUrl, 0);
+// crawlLinkRecursive(headNode).then(function(arrayOfChildNodes) {
+//     headNode.childNodes = arrayOfChildNodes
+//     console.log('\n\n\n\n\n\nDONEDONEDONE');
+//     headNode.prettyPrint();
+// })
+
+module.exports = function(url) {
+  var headNode = new UrlNode(url, 0);
+
+  return crawlLinkRecursive(headNode)
+  .then(function(arrayOfChildNodes) {
     headNode.childNodes = arrayOfChildNodes
-    //console.log(arrayOfChildNodes);
     console.log('\n\n\n\n\n\nDONEDONEDONE');
     headNode.prettyPrint();
+    return headNode;
 })
+
+
+}
