@@ -17,20 +17,14 @@ var shortTestContent = "Hello hello, 123 45 object Object objects objective obje
 
 //
 var getWordFrequencyFromString = function(str, maxNumWords) {
-    console.time('getWordFrequencyFromString')
+    //console.time('getWordFrequencyFromString')
     str = str.replace(/[0-9]/g,'');
     var arrDirtyWords = tokenizer.tokenize(str.replace(/[^\w\s]/gi, ' '));
-    //console.log('num words before filter', arrDirtyWords.length);
     var arrFilteredWords = filterStopWords(arrDirtyWords);
-    // console.log('num words after filter', arrFilteredWords.length);
-    // console.time('buildStemmerHash');
     var sHash = buildStemmerHash(arrFilteredWords);
-    // console.timeEnd('buildStemmerHash');
-    // console.time('buildEnglishHash');
     var englishHash = buildEnglishHash(arrFilteredWords);
-    //console.timeEnd('buildEnglishHash');
     var sortedHash = sortAndTrim(englishHash, maxNumWords);
-    console.timeEnd('getWordFrequencyFromString');
+    //console.timeEnd('getWordFrequencyFromString');
     return sortedHash;
 };
 

@@ -69,14 +69,13 @@ var crawlLinkRecursive = function(parentNode) {
     //async: gets html from url and extracts keywords and childlinks
     return getObjectData(parentNode.url, 10)
     .then(function(urlData){
+        //console.log(urlData);
         //now we have keywords and childurls for this node.
         parentNode.keywords = urlData.keywords;
         //then, for each link, do the same
-        //console.log(parentNode.keywords);
-        //console.log(urlData.childurls[0]);
         if(urlData.childurls) {
-            //Promise.resolve(urlData.childurls)
-            urlData.childurls.then(function(links) {
+            return Promise.resolve(urlData.childurls)
+            .then(function(links) {
                 console.log(links);
                 return links;
             })
@@ -103,23 +102,22 @@ var crawlLinkRecursive = function(parentNode) {
 //for testing - uncomment this....
 var testUrl = 'http://blog.miguelgrinberg.com/post/easy-web-scraping-with-nodejs';
 var headNode = new UrlNode(testUrl, 0);
-crawlLinkRecursive(headNode).then(function(arrayOfChildNodes) {
+crawlLinkRecursive(headNode)
+.then(function(arrayOfChildNodes) {
     headNode.childNodes = arrayOfChildNodes
     console.log('\n\n\n\n\n\nDONEDONEDONE');
     //console.log(headNode);
     headNode.prettyPrint();
 })
 
-module.exports = function(url) {
-  var headNode = new UrlNode(url, 0);
+// module.exports = function(url) {
+//   var headNode = new UrlNode(url, 0);
 
-  return crawlLinkRecursive(headNode)
-  .then(function(arrayOfChildNodes) {
-    headNode.childNodes = arrayOfChildNodes
-    console.log('\n\n\n\n\n\nDONEDONEDONE');
-    headNode.prettyPrint();
-    return headNode;
-})
-
-
-}
+//   return crawlLinkRecursive(headNode)
+//   .then(function(arrayOfChildNodes) {
+//     headNode.childNodes = arrayOfChildNodes
+//     console.log('\n\n\n\n\n\nDONEDONEDONE');
+//     headNode.prettyPrint();
+//     return headNode;
+// })
+// }

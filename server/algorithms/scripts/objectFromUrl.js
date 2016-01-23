@@ -17,12 +17,12 @@ var grabAndParseUrl = function(url, maxNumKeyWords) {
         var text = textFromHtml(htmlObj.html);
         var linksArr = linksFromHtml(htmlObj);
         var formattedContent = contentToArray(text, maxNumKeyWords);
-        // console.log(formattedContent);
-        // console.log(linksArr);
-        return({keywords: formattedContent, childurls: linksArr});
+        //console.log("GOOD");
+        return Promise.resolve({keywords: formattedContent, childurls: linksArr});
     }).catch(function(err){
-    //catch error here and return it to crawl function
-        return {keywords: {}, childurls: []};
+        //console.log('BAD');
+        //catch error here and return empty obj to crawl function
+        return Promise.resolve({keywords: {}, childurls: []});
     })
 }
 
