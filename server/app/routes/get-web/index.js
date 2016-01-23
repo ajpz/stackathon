@@ -1,11 +1,17 @@
 'use strict';
-var algo = require('../../algorithms/algo');
+var crawl = require('../../../algorithms/crawl');
 var router = require('express').Router();
 module.exports = router;
 
 router.post('/', function(req, res, next) {
   var originUrl = req.body.url;
   var originHtml = req.body.html;
+
+  crawl(req.body.url)
+  .then(function(originNode) {
+    res.json(originNode);
+  })
+  .then(null, next);
 
 });
 
