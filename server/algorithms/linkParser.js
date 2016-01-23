@@ -18,7 +18,7 @@ var getExternalLinksOnly = function(allLinks, host) {
     .slice(0,-1)
     .filter(function(word) {
       return excludeSchemes.indexOf(word) === -1;
-    }).concat(['html', 'pdf']);
+    }).concat(['html', 'pdf', 'asp', 'css', 'jpg', 'gif','javascript']);
 
   var urlIsHostRelated = function(url) {
     for(var i = 0; i < hostWords.length; i++) {
@@ -113,9 +113,10 @@ var getLinks = function(html) {
 module.exports = function(originHref) {
   // var originHref = 'http://www.berkshirehathaway.com';
   var scrapedData;
-
-  getHtml(originHref)
+  //console.log('begin parsing');
+  return getHtml(originHref)
   .then(function(scraped) {
+    //console.log('scraped', scraped);
     scrapedData = scraped;
     return getLinks(scraped.html);
   })
@@ -129,7 +130,7 @@ module.exports = function(originHref) {
   })
   .then(function(links) {
     var unique = _.uniq(links);
-    console.log('\n\n--------------------\nUNIQUE LINKS ARRAY : ', unique);
+    //console.log('\n\n--------------------\nUNIQUE LINKS ARRAY : ', unique);
     return unique;
   })
 };
