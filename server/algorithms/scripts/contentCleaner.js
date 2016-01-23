@@ -20,15 +20,15 @@ var getWordFrequencyFromString = function(str, maxNumWords) {
     console.time('getWordFrequencyFromString')
     str = str.replace(/[0-9]/g,'');
     var arrDirtyWords = tokenizer.tokenize(str.replace(/[^\w\s]/gi, ' '));
-    console.log('num words before filter', arrDirtyWords.length);
+    //console.log('num words before filter', arrDirtyWords.length);
     var arrFilteredWords = filterStopWords(arrDirtyWords);
-    console.log('num words after filter', arrFilteredWords.length);
-    console.time('buildStemmerHash');
+    // console.log('num words after filter', arrFilteredWords.length);
+    // console.time('buildStemmerHash');
     var sHash = buildStemmerHash(arrFilteredWords);
-    console.timeEnd('buildStemmerHash');
-    console.time('buildEnglishHash');
+    // console.timeEnd('buildStemmerHash');
+    // console.time('buildEnglishHash');
     var englishHash = buildEnglishHash(arrFilteredWords);
-    console.timeEnd('buildEnglishHash');
+    //console.timeEnd('buildEnglishHash');
     var sortedHash = sortAndTrim(englishHash, maxNumWords);
     console.timeEnd('getWordFrequencyFromString');
     return sortedHash;
