@@ -20,7 +20,10 @@ var grabAndParseUrl = function(url, maxNumKeyWords) {
         // console.log(formattedContent);
         // console.log(linksArr);
         return({keywords: formattedContent, childurls: linksArr});
-    });
+    }).catch(function(err){
+    //catch error here and return it to crawl function
+        return {keywords: {}, childurls: []};
+    })
 }
 
 module.exports = function(url, maxNumKeyWords){

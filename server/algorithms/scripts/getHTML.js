@@ -23,7 +23,7 @@ var getHtml = function(href) {
 
     var request = http.request(options, function(response){
       requestCounter++;
-      console.log('--REQUEST ' + requestCounter + ' ' + '[' + host + ',' +path + ']');
+      console.log('++REQUEST ' + requestCounter + ' ' + '[' + host + ',' +path + ']');
 
       var html = '';
       response.setEncoding('utf8');
@@ -34,21 +34,22 @@ var getHtml = function(href) {
 
       response.on('end', function(){
         endCounter++;
-        console.log('----END EVENT: ' + endCounter + ' ' + '[' + host + ',' +path + ']');
+        console.log('++++END EVENT: ' + endCounter + ' ' + '[' + host + ',' +path + ']');
         resolve({ host: host, html: html, reqC: requestCounter, errC: errorCounter, endC: endCounter, dataC: dataCounter });
       });
     });
 
     request.on('error', function(err) {
       errorCounter++;
-      console.log('----ERROR EVENT: ' + errorCounter + ' ' + '[' + host + ',' +path + ']');
+      console.log('++++ERROR EVENT: ' + errorCounter + ' ' + '[' + host +path + ']');
       reject(err);
     });
 
     request.setTimeout(3000, function() {
       timeoutCounter++;
-      console.log('----TIMEOUT EVENT: ' + timeoutCounter + ' ' + '[' + host + ',' +path + ']');
+      console.log('++++TIMEOUT EVENT: ' + timeoutCounter + ' ' + '[' + host + ',' +path + ']');
       request.abort();
+      reject(new Error('TIMEOUT EVENT FOR ' + host +path));
     })
 
     request.end();

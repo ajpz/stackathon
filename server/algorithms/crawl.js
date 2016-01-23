@@ -39,7 +39,7 @@ UrlNode.prototype.prettyPrint = function()
         depthStr +='--';
         i++;
     }
-    console.log(depthStr + this.url + ',#Children:' + (this.childNodes ? this.childNodes.length : 0));
+    console.log(depthStr + this.url + ',#Children:' + (this.childNodes ? this.childNodes.length : 0) + '--');
     if(this.childNodes) {
         for (i = 0; i < this.childNodes.length; i++) {
             this.childNodes[i].prettyPrint();   //use prettyPrint for debugging tree
@@ -72,10 +72,14 @@ var crawlLinkRecursive = function(parentNode) {
         //now we have keywords and childurls for this node.
         parentNode.keywords = urlData.keywords;
         //then, for each link, do the same
-        console.log(parentNode.keywords);
-        console.log(urlData.childurls[0]);
+        //console.log(parentNode.keywords);
+        //console.log(urlData.childurls[0]);
         if(urlData.childurls) {
-            urlData.childurls
+            //Promise.resolve(urlData.childurls)
+            urlData.childurls.then(function(links) {
+                console.log(links);
+                return links;
+            })
             .map(function(link) {
                 var newNode = new UrlNode(link, parentNode.depth + 1);
                 if(newNode.depth < MAX_DEPTH) {
@@ -90,6 +94,9 @@ var crawlLinkRecursive = function(parentNode) {
                 return newNode;
             });
         }
+    }).catch(function(err) {
+        console.log("\n\n\n\n\n\nERROR IN LINE 94\n\n\n\n");
+        console.log(err);
     });
 }
 
@@ -99,8 +106,8 @@ var headNode = new UrlNode(testUrl, 0);
 crawlLinkRecursive(headNode).then(function(arrayOfChildNodes) {
     headNode.childNodes = arrayOfChildNodes
     console.log('\n\n\n\n\n\nDONEDONEDONE');
-    console.log(headNode);
-    //headNode.prettyPrint();
+    //console.log(headNode);
+    headNode.prettyPrint();
 })
 
 module.exports = function(url) {
