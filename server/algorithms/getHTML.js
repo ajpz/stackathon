@@ -2,37 +2,54 @@ var http = require('http');
 var Promise = require('bluebird');
 var urlParser = require('url').parse;
 
+var requestCounter = 0;
+var errorCounter = 0;
+var endCounter = 0;
+var dataCounter = 0;
+var timeoutCounter = 0;
+
 var getHtml = function(href) {
-  console.log('beginning getHtml', href);
+
   var parsedUrl = urlParser(href),
       host = parsedUrl.host,
       path = parsedUrl.path || '/';
 
-  if(!path) path = '/';
-  console.log(path);
+  // if(!path) path = '/';
+
   var options = { host: host, path: path, method: 'GET', headers: {Accept: "text/html"}};
 
   return new Promise(function(resolve, reject) {
-    console.log('requesting html');
+
+
     var request = http.request(options, function(response){
+      requestCounter++;
+      console.log('--REQUEST ' + requestCounter + ' ' + '[' + host + ',' +path + ']');
+
       var html = '';
       response.setEncoding('utf8');
 
       response.on('data', function(chunk) {
-        //console.log('getting data');
         html += chunk;
       });
 
       response.on('end', function(){
-        //console.log('end', html);
-        resolve({ host: host, html: html });
+        endCounter++;
+        console.log('----END EVENT: ' + endCounter + ' ' + '[' + host + ',' +path + ']');
+        resolve({ host: host, html: html, reqC: requestCounter, errC: errorCounter, endC: endCounter, dataC: dataCounter });
       });
     });
 
     request.on('error', function(err) {
-      console.error('\n\n\nERROR!!!\n\n\nproblem occured: ', err.message);
+      errorCounter++;
+      console.log('----ERROR EVENT: ' + errorCounter + ' ' + '[' + host + ',' +path + ']');
       reject(err);
     });
+
+    request.setTimeout(3000, function() {
+      timeoutCounter++;
+      console.log('----TIMEOUT EVENT: ' + timeoutCounter + ' ' + '[' + host + ',' +path + ']');
+      request.abort();
+    })
 
     request.end();
   })
