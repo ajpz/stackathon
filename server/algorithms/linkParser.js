@@ -110,26 +110,40 @@ var getLinks = function(html) {
 }
 
 
-module.exports = function(originHref) {
-  var scrapedData;
-  return getHtml(originHref)
-  .then(function(scraped) {
-    scrapedData = scraped;
-    return getLinks(scraped.html);
-  })
-  .then(function(allLinks) {
-    return getExternalLinksOnly(allLinks, scrapedData.host);
-  })
-  .then(function(externalLinks) {
-    return externalLinks.map(function(linkArr) {
+// module.exports = function(originHref) {
+//   var scrapedData;
+//   return getHtml(originHref)
+//   .then(function(scraped) {
+//     scrapedData = scraped;
+//     return getLinks(scraped.html);
+//   })
+//   .then(function(allLinks) {
+//     return getExternalLinksOnly(allLinks, scrapedData.host);
+//   })
+//   .then(function(externalLinks) {
+//     return externalLinks.map(function(linkArr) {
+//       return linkArr[0];
+//     })
+//   })
+//   .then(function(links) {
+//     var unique = _.uniq(links);
+//     return unique;
+//   })
+//   .then(null, function(err) {
+//     console.error('\n\nLINK PARSER FAILED\n\n')
+//   })
+// };
+
+module.exports = function(htmlObj) {
+  var allLinks = getLinks(htmlObj.html);
+  var externalLinks = getExternalLinksOnly(allLinks, htmlObj.host);
+
+  var links = externalLinks.map(function(linkArr) {
       return linkArr[0];
-    })
-  })
-  .then(function(links) {
-    var unique = _.uniq(links);
-    return unique;
-  })
-  .then(null, function(err) {
-    console.error('\n\nLINK PARSER FAILED\n\n')
-  })
+    });
+  return _.uniq(links);
+  // })
+  // .then(null, function(err) {
+  //   console.error('\n\nLINK PARSER FAILED\n\n')
+  // })
 };
