@@ -1,6 +1,7 @@
 var Promise = require('bluebird');
 var _ = require('lodash');
 var getObjectData = require('./scripts/objectFromUrl.js');
+var fs = require('fs');
 //var linkParser = require('./scripts/linkParser.js');
 /*
 
@@ -47,6 +48,28 @@ UrlNode.prototype.prettyPrint = function()
     }
 }
 
+UrlNode.prototype.removeLeafChildren = function() {
+
+    var removeLeafChildren = function (node) {
+        //recursively go through all nodes
+        //if node has empty childNode array, delete the childNode property altogether
+
+        var children = node.childNodes;
+
+        if(children.length === 0) {
+            delete node.childNodes;
+            return;
+        }
+
+        for (var i = 0; i < children.length; i++) {
+            removeLeafChildren(children[i]);
+        }
+        return;
+    }
+
+    removeLeafChildren(this);
+}
+
 // var crawlLinkRecursive = function(parentNode) {
 //     return linkParser(parentNode.url)
 //     .map(function(link) {
@@ -72,6 +95,7 @@ var crawlLinkRecursive = function(parentNode) {
         //console.log(urlData);
         //now we have keywords and childurls for this node.
         parentNode.keywords = urlData.keywords;
+        parentNode.title = urlData.title;
         //then, for each link, do the same
         if(urlData.childurls) {
             return Promise.resolve(urlData.childurls)
@@ -100,24 +124,35 @@ var crawlLinkRecursive = function(parentNode) {
 }
 
 //for testing - uncomment this....
-var testUrl = 'http://blog.miguelgrinberg.com/post/easy-web-scraping-with-nodejs';
-var headNode = new UrlNode(testUrl, 0);
-crawlLinkRecursive(headNode)
-.then(function(arrayOfChildNodes) {
-    headNode.childNodes = arrayOfChildNodes
-    console.log('\n\n\n\n\n\nDONEDONEDONE');
-    //console.log(headNode);
-    headNode.prettyPrint();
-})
-
-// module.exports = function(url) {
-//   var headNode = new UrlNode(url, 0);
-
-//   return crawlLinkRecursive(headNode)
-//   .then(function(arrayOfChildNodes) {
+// var testUrl = 'http://blog.miguelgrinberg.com/post/easy-web-scraping-with-nodejs';
+// var headNode = new UrlNode(testUrl, 0);
+// crawlLinkRecursive(headNode)
+// .then(function(arrayOfChildNodes) {
 //     headNode.childNodes = arrayOfChildNodes
 //     console.log('\n\n\n\n\n\nDONEDONEDONE');
+//     //console.log(headNode);
 //     headNode.prettyPrint();
 //     return headNode;
 // })
-// }
+// .then(function(headNode) {
+//     headNode.removeLeafChildren();
+//     fs.writeFileSync('./formatted_data.json', JSON.stringify(headNode));
+// })
+
+module.exports = function(url) {
+    var headNode = new UrlNode(url, 0);
+
+    return crawlLinkRecursive(headNode)
+    .then(function(arrayOfChildNodes) {
+        headNode.childNodes = arrayOfChildNodes
+        console.log('\n\n\n\n\n\nDONEDONEDONE');
+        headNode.prettyPrint();
+        return headNode;
+    })
+    .then(function(headNode) {
+        headNode.removeLeafChildren();
+        console.log("DIRECTORY: ", __dirname)
+        fs.writeFileSync('./public/data/route-generated.json', JSON.stringify(headNode));
+        return headNode;
+    })
+}
