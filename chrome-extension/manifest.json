@@ -1,0 +1,26 @@
+{
+    "manifest_version": 2,
+
+    "name": "Browser action that finds neighbor sites and displays a pop-up and host url dom manipulation",
+    "description": "Shows a radial tree representing exteranl links",
+    "version": "1.0",
+
+    "browser_action": {
+        "default_icon": "Web-icon.png",
+        "default_popup": "popup.html",
+        "default_title": "Get this page's neighbors!"
+    },
+    "permissions": [
+        "activeTab",
+        // "tabs",
+        "http://localhost:1337/",
+        "storage",
+        //for modal
+    ],
+    // "content_scripts" : [
+    // {
+    //     "js": ["jquery-1.8.3.js", "jquery-ui.js", "modal.js"],
+    //     "css": [ "jquery-ui.css" ]
+    // }
+],
+}
