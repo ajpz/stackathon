@@ -15,10 +15,11 @@ var getHtml = require('./getHtml');
 var grabAndParseUrl = function(url, maxNumKeyWords) {
     return getHtml(url).then(function(htmlObj){
         var text = textFromHtml(htmlObj.html);
+        var title = textFromHtml(htmlObj.html);
         var linksArr = linksFromHtml(htmlObj);
         var formattedContent = contentToArray(text, maxNumKeyWords);
         //console.log("GOOD");
-        return Promise.resolve({keywords: formattedContent, childurls: linksArr});
+        return Promise.resolve({keywords: formattedContent, childurls: linksArr, title: title});
     }).catch(function(err){
         //console.log('BAD');
         //catch error here and return empty obj to crawl function
