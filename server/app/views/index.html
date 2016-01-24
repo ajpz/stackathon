@@ -13,9 +13,30 @@
     <script src="/angular-ui-bootstrap/ui-bootstrap-tpls.js"></script>
     <script src="/socket.io-client/socket.io.js"></script>
     <script src="/main.js"></script>
+    <script src="d3.min.js"></script>
+    <!-- style for D3 tree -->
+    <style>
+
+        .node circle {
+          fill: #fff;
+          stroke: steelblue;
+          stroke-width: 1.5px;
+        }
+
+        .node {
+          font: 10px sans-serif;
+        }
+
+        .link {
+          fill: none;
+          stroke: #ccc;
+          stroke-width: 1.5px;
+        }
+
+    </style>
 </head>
 <body ng-app="FullstackGeneratedApp">
-    <navbar></navbar>
+    <navbar></navbar>20
     <div id="main" ui-view></div>
 </body>
 </html>
