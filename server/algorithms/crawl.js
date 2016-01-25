@@ -1,6 +1,8 @@
 var Promise = require('bluebird');
 var _ = require('lodash');
 var getObjectData = require('./scripts/objectFromUrl.js');
+var fs = require('fs');
+var urlParser = require('url').parse;
 //var linkParser = require('./scripts/linkParser.js');
 /*
 
@@ -39,12 +41,35 @@ UrlNode.prototype.prettyPrint = function()
         depthStr +='--';
         i++;
     }
-    console.log(depthStr + this.url + ',#Children:' + (this.childNodes ? this.childNodes.length : 0));
+    console.log(depthStr + this.url + ',#Children:' + (this.childNodes ? this.childNodes.length : 0) + '--');
     if(this.childNodes) {
         for (i = 0; i < this.childNodes.length; i++) {
             this.childNodes[i].prettyPrint();   //use prettyPrint for debugging tree
         }
     }
+}
+
+UrlNode.prototype.removeLeafChildren = function() {
+
+    var removeLeafChildren = function (node) {
+        //create shortUrl property
+        node.shortUrl = urlParser(node.url).host;
+        var children = node.childNodes;
+        //recursively go through all nodes
+        //if node has empty childNode array, delete the childNode property altogether
+
+        if(children.length === 0) {
+            delete node.childNodes;
+            return;
+        }
+
+        for (var i = 0; i < children.length; i++) {
+            removeLeafChildren(children[i]);
+        }
+        return;
+    }
+
+    removeLeafChildren(this);
 }
 
 // var crawlLinkRecursive = function(parentNode) {
@@ -69,13 +94,17 @@ var crawlLinkRecursive = function(parentNode) {
     //async: gets html from url and extracts keywords and childlinks
     return getObjectData(parentNode.url, 10)
     .then(function(urlData){
+        //console.log(urlData);
         //now we have keywords and childurls for this node.
         parentNode.keywords = urlData.keywords;
+        parentNode.title = urlData.title;
         //then, for each link, do the same
-        console.log(parentNode.keywords);
-        console.log(urlData.childurls[0]);
         if(urlData.childurls) {
-            urlData.childurls
+            return Promise.resolve(urlData.childurls)
+            .then(function(links) {
+                console.log(links);
+                return links;
+            })
             .map(function(link) {
                 var newNode = new UrlNode(link, parentNode.depth + 1);
                 if(newNode.depth < MAX_DEPTH) {
@@ -90,29 +119,42 @@ var crawlLinkRecursive = function(parentNode) {
                 return newNode;
             });
         }
+    }).catch(function(err) {
+        console.log("\n\n\n\n\n\nERROR IN LINE 94\n\n\n\n");
+        console.log(err);
     });
 }
 
 //for testing - uncomment this....
-var testUrl = 'http://blog.miguelgrinberg.com/post/easy-web-scraping-with-nodejs';
-var headNode = new UrlNode(testUrl, 0);
-crawlLinkRecursive(headNode).then(function(arrayOfChildNodes) {
-    headNode.childNodes = arrayOfChildNodes
-    console.log('\n\n\n\n\n\nDONEDONEDONE');
-    console.log(headNode);
-    //headNode.prettyPrint();
-})
+// var testUrl = 'http://blog.miguelgrinberg.com/post/easy-web-scraping-with-nodejs';
+// var headNode = new UrlNode(testUrl, 0);
+// crawlLinkRecursive(headNode)
+// .then(function(arrayOfChildNodes) {
+//     headNode.childNodes = arrayOfChildNodes
+//     console.log('\n\n\n\n\n\nDONEDONEDONE');
+//     //console.log(headNode);
+//     headNode.prettyPrint();
+//     return headNode;
+// })
+// .then(function(headNode) {
+//     headNode.removeLeafChildren();
+//     fs.writeFileSync('./formatted_data.json', JSON.stringify(headNode));
+// })
 
 module.exports = function(url) {
-  var headNode = new UrlNode(url, 0);
+    var headNode = new UrlNode(url, 0);
 
-  return crawlLinkRecursive(headNode)
-  .then(function(arrayOfChildNodes) {
-    headNode.childNodes = arrayOfChildNodes
-    console.log('\n\n\n\n\n\nDONEDONEDONE');
-    headNode.prettyPrint();
-    return headNode;
-})
-
-
+    return crawlLinkRecursive(headNode)
+    .then(function(arrayOfChildNodes) {
+        headNode.childNodes = arrayOfChildNodes
+        console.log('\n\n\n\n\n\nDONEDONEDONE');
+        headNode.prettyPrint();
+        return headNode;
+    })
+    .then(function(headNode) {
+        headNode.removeLeafChildren();
+        console.log("DIRECTORY: ", __dirname)
+        fs.writeFileSync('./public/data/route-generated.json', JSON.stringify(headNode));
+        return headNode;
+    })
 }
