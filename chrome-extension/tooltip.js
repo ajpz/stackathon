@@ -4,7 +4,7 @@
 
   //var typeFace = 'Gorditas';
 var minFontSize = 40;
-var colors = d3.scale.category20b();
+var colors = d3.scale.category20c(); //https://github.com/mbostock/d3/wiki/Ordinal-Scales
 var width = 300;
 var height = 300;
 function drawCloud(words) {
@@ -32,6 +32,7 @@ function drawCloud(words) {
 
 // [{"text": "hello", "size": 23}, {"text": "night","size": 3}...]
 function calculateCloud(data) {
+  data = mapFontSize(data);
   d3.layout.cloud()
     .size([width*1.5, height*1.5])
     .words(data)
@@ -41,3 +42,24 @@ function calculateCloud(data) {
     .on('end', drawCloud)
     .start();
 };
+
+//[{'text': xxx, 'size': 1},{'text': yyy, 'size': 10},{'text': zzz, 'size': 3}]
+function mapFontSize(words) {
+  var sizeArr = words.map(function(obj) {
+    return obj.size;
+  });
+  var minDataPoint = d3.min(sizeArr);
+  var maxDataPoint = d3.max(sizeArr);
+  var linearScale = d3.scale.linear()
+    .domain([minDataPoint, maxDataPoint])
+    .range([10, 40]);
+
+  var resizedWords = [];
+  resizedWords = words.map(function(obj) {
+    return {
+      'text': obj['text'],
+      'size': linearScale(obj['size'])
+    }
+  });
+  return resizedWords;
+}

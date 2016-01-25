@@ -33,21 +33,39 @@ function UrlNode(url, depth) { //removed 3rd param: parentNode to try and limit 
     this.childNodes = [];
 };
 
-UrlNode.prototype.prettyPrint = function()
+// UrlNode.prototype.prettyPrintOld = function()
+// {
+//     var depthStr = ''
+//     var i = 0;
+//     while(i <= this.depth) {
+//         depthStr +='--';
+//         i++;
+//     }
+//     console.log(depthStr + this.url + ',#Children:' + (this.childNodes ? this.childNodes.length : 0));
+//     if(this.childNodes) {
+//         for (i = 0; i < this.childNodes.length; i++) {
+//             this.childNodes[i].prettyPrint();   //use prettyPrint for debugging tree
+//         }
+//     }
+// }
+UrlNode.prototype.prettyPrint = function(indent, last)
 {
-    var depthStr = ''
-    var i = 0;
-    while(i <= this.depth) {
-        depthStr +='--';
-        i++;
+    var thisLine = indent;
+    //console.log(indent);
+    if(last){
+        thisLine +='\\-';
+        indent +="  ";
     }
-    console.log(depthStr + this.url + ',#Children:' + (this.childNodes ? this.childNodes.length : 0) + '--');
-    if(this.childNodes) {
-        for (i = 0; i < this.childNodes.length; i++) {
-            this.childNodes[i].prettyPrint();   //use prettyPrint for debugging tree
-        }
+    else {
+        thisLine += '|-';
+        indent +='| ';
     }
-}
+    console.log(thisLine + this.url);
+
+    for (var i = 0; i < this.childNodes.length; i++) {
+        this.childNodes[i].prettyPrint(indent, i === this.childNodes.length -1);   //use prettyPrint for debugging tree
+    }
+};
 
 UrlNode.prototype.removeLeafChildren = function() {
 
@@ -70,7 +88,7 @@ UrlNode.prototype.removeLeafChildren = function() {
     }
 
     removeLeafChildren(this);
-}
+};
 
 // var crawlLinkRecursive = function(parentNode) {
 //     return linkParser(parentNode.url)
@@ -94,13 +112,11 @@ var crawlLinkRecursive = function(parentNode) {
     //async: gets html from url and extracts words and childlinks
     return getObjectData(parentNode.url, 12)
     .then(function(urlData){
-        console.log('CRAWL GOT DATA');
         var wordsArr = Object.keys(urlData.words).map(function(k){
             return {
                 'text': k, 'size': urlData.words[k]
             }
         });
-        console.log(wordsArr);
         //now we have words and childurls for this node.
         parentNode.words = wordsArr;
         parentNode.title = urlData.title;
@@ -126,7 +142,7 @@ var crawlLinkRecursive = function(parentNode) {
             });
         }
     }).catch(function(err) {
-        console.log("\n\n\n\n\n\nERROR IN LINE 94\n\n\n\n");
+        console.log("\n\n\n\n\n\nERROR IN LINE 127\n\n\n\n");
         console.log(err);
     });
 }
@@ -154,12 +170,12 @@ module.exports = function(url) {
     .then(function(arrayOfChildNodes) {
         headNode.childNodes = arrayOfChildNodes
         console.log('\n\n\n\n\n\nDONEDONEDONE');
-        headNode.prettyPrint();
+        headNode.prettyPrint("", true);
         return headNode;
     })
     .then(function(headNode) {
         headNode.removeLeafChildren();
-        console.log("DIRECTORY: ", __dirname, headNode)
+        //console.log("DIRECTORY: ", __dirname, headNode)
         //fs.writeFileSync('./public/data/route-generated.json', JSON.stringify(headNode));
         return headNode;
     })

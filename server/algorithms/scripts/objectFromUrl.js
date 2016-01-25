@@ -8,6 +8,7 @@
 */
 var contentToArray = require('./contentCleaner');
 var textFromHtml = require('./contentParser');
+var titleFromUrl = require('./titleParser');
 var linksFromHtml = require('./linkParser');
 var getHtml = require('./getHtml');
 
@@ -15,7 +16,7 @@ var getHtml = require('./getHtml');
 var grabAndParseUrl = function(url, maxNumKeyWords) {
     return getHtml(url).then(function(htmlObj){
         var text = textFromHtml(htmlObj.html);
-        var title = textFromHtml(htmlObj.html);
+        var title = titleFromUrl(htmlObj.html);
         var linksArr = linksFromHtml(htmlObj);
         var formattedContent = contentToArray(text, maxNumKeyWords);
         //console.log("GOOD");

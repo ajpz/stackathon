@@ -43,7 +43,7 @@ chrome.runtime.onMessage.addListener(
                     })
                     .on("mouseout", function(d) {
                         // cloudTip.style('display', 'none');
-                        d3.select('#curTip').remove();
+                        d3.select('#curTip')x.remove();
                     });
 
                 node.append("text")
