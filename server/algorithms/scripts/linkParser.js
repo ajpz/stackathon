@@ -33,7 +33,8 @@ var getExternalLinksOnly = function(allLinks, host) {
 
     if( startCharsToExclude.indexOf(link[0][0]) > -1 ||
         link[1] === 'link' ||
-        urlIsHostRelated(link[0]) ) {
+        urlIsHostRelated(link[0]) ||
+        link[0].slice(0,4) !== 'http' ) {
 
       excludedLinks.push(link[0]);
       return false;

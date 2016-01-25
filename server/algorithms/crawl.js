@@ -57,7 +57,7 @@ UrlNode.prototype.removeLeafChildren = function() {
         var children = node.childNodes;
         //recursively go through all nodes
         //if node has empty childNode array, delete the childNode property altogether
-
+        if(!children) return;
         if(children.length === 0) {
             delete node.childNodes;
             return;
@@ -105,25 +105,27 @@ var crawlLinkRecursive = function(parentNode) {
         parentNode.words = wordsArr;
         parentNode.title = urlData.title;
         //then, for each link, do the same
-        if(urlData.childurls) {
-            return Promise.resolve(urlData.childurls)
-            .then(function(links) {
-                console.log(links);
-                return links;
-            })
-            .map(function(link) {
-                var newNode = new UrlNode(link, parentNode.depth + 1);
-                if(newNode.depth < MAX_DEPTH) {
-                    return crawlLinkRecursive(newNode).then(function(childNodes) {
-                        newNode.childNodes = childNodes;
-                        return newNode;
-                    }).catch(function(err) {
-                        newNode.childNodes = [];
-                        return newNode;
-                    });
-                }
-                return newNode;
-            });
+        if(parentNode.depth < MAX_DEPTH) {
+            if(urlData.childurls) {
+                return Promise.resolve(urlData.childurls)
+                .then(function(links) {
+                    console.log(links);
+                    return links;
+                })
+                .map(function(link) {
+                    var newNode = new UrlNode(link, parentNode.depth + 1);
+                    if(newNode.depth <= MAX_DEPTH) {
+                        return crawlLinkRecursive(newNode).then(function(childNodes) {
+                            newNode.childNodes = childNodes;
+                            return newNode;
+                        }).catch(function(err) {
+                            newNode.childNodes = [];
+                            return newNode;
+                        });
+                    }
+                    return newNode;
+                });
+            }
         }
     }).catch(function(err) {
         console.log("\n\n\n\n\n\nERROR IN LINE 94\n\n\n\n");
