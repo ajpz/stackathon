@@ -68,7 +68,16 @@ function drawTree (root) {
             .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
 
         node.append("circle")
-            .attr("r", 4.5);
+            .attr("r", 4.5)
+            .on("mouseover", function(d) {
+                console.log(d);
+                calculateCloud(d.words);
+                tooltip.style('display', 'block');
+            })
+            .on("mouseout", function(d) {
+                tooltip.style('display', 'none');
+                d3.select('#curTip').remove();
+            });
 
         node.append("text")
             .attr("dy", ".31em")

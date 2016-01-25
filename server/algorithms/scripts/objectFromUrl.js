@@ -19,11 +19,11 @@ var grabAndParseUrl = function(url, maxNumKeyWords) {
         var linksArr = linksFromHtml(htmlObj);
         var formattedContent = contentToArray(text, maxNumKeyWords);
         //console.log("GOOD");
-        return Promise.resolve({keywords: formattedContent, childurls: linksArr, title: title});
+        return Promise.resolve({words: formattedContent, childurls: linksArr, title: title});
     }).catch(function(err){
         //console.log('BAD');
         //catch error here and return empty obj to crawl function
-        return Promise.resolve({keywords: {}, childurls: []});
+        return Promise.resolve({words: {}, childurls: []});
     })
 }
 
