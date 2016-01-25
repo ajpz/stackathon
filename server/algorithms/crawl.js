@@ -96,8 +96,14 @@ var crawlLinkRecursive = function(parentNode) {
     .then(function(urlData){
         console.log('CRAWL GOT DATA');
         console.log(urlData);
+        var wordsArr = Object.keys(urlData.words).map(function(k){
+            return {
+                'text': k, 'size': urlData.words[k]
+            }
+        });
+        console.log(wordsArr);
         //now we have words and childurls for this node.
-        parentNode.words = urlData.words;
+        parentNode.words = wordsArr;
         parentNode.title = urlData.title;
         //then, for each link, do the same
         if(urlData.childurls) {

@@ -3,7 +3,7 @@ Takes a string of words
 Removes "stop words"
 Access natural node module to stem
 Groups and counts remaining words
-Returns array of {text:, size:} pairs.
+Returns object of word: count pairs.
 */
 var _ = require('lodash');
 var natural = require('natural');
@@ -24,8 +24,6 @@ var getWordFrequencyFromString = function(str, maxNumWords) {
     var sHash = buildStemmerHash(arrFilteredWords);
     var englishHash = buildEnglishHash(arrFilteredWords);
     var sortedHash = sortAndTrim(englishHash, maxNumWords);
-    console.log('\n\n\n\n\nSORTD HASH:')
-    console.log(sortedHash);
     //console.timeEnd('getWordFrequencyFromString');
     return sortedHash;
 };
@@ -124,12 +122,8 @@ var sortAndTrim = function (obj, numKeys) {
     if(numKeys) {
         arr = arr.splice(0, numKeys);
     }
-    //return _.object(arr);
-    return arr.map(function(kvPair) {
-        return {
-            'text': kvPair[0], 'size': kvPair[1]
-        };
-    })
+    return _.object(arr);
+    //return arr;
 };
 
 //getWordFrequencyFromString(testContent);
