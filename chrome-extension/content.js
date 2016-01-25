@@ -13,7 +13,8 @@ chrome.runtime.onMessage.addListener(
 
             console.log('D3 SCRIPT IS RUNNING');
 
-            // helper function that wraps all root-dependent functionality
+            // Helper function that creates the radial tree
+            // receives the data-structure, "root"
             var drawWhenDataAvailable = function(root) {
                 console.log('D3.JSON CB FUNCTION INVOKED WITH ROOT', typeof root, root);
 
@@ -39,10 +40,10 @@ chrome.runtime.onMessage.addListener(
                     .attr("dy", ".31em")
                     .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
                     .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
-                    .text(function(d) { return d.url; });
+                    .text(function(d) { return d.shortUrl; });
             };
 
-
+            //This code builds the DOM-modal using jquery-ui dialog module
             var layerNode = document.createElement('div');
             layerNode.setAttribute('id', 'dialog');
             layerNode.setAttribute('title', 'View your neighbors!');
@@ -72,11 +73,11 @@ chrome.runtime.onMessage.addListener(
 
 
             //basic D3 tree configuration
-            var diameter = 900;
+            var diameter = 800;
 
             var tree = d3.layout.tree()
             .children(function(d) {
-                return d.childNodes;  //update the children accessor function
+                return d.childNodes;  //override the children accessor function to use childNodes instead
             })
             .size([360, diameter / 2 - 120])
             .separation(function(a, b) {
@@ -92,6 +93,7 @@ chrome.runtime.onMessage.addListener(
                 .append("g")
                 .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
 
+            // Invoke helper function to creat and append nodes to the svg
             drawWhenDataAvailable(root);
 
             d3.select(self.frameElement).style("height", diameter - 150 + "px");

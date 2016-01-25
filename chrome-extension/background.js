@@ -13,18 +13,19 @@
 //   });
 // });
 
-chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
-    if( request.message === "open_new_tab" ) {
-      chrome.tabs.create({"url": request.url});
-    }
-  }
-);
+// chrome.runtime.onMessage.addListener(
+//   function(request, sender, sendResponse) {
+//     if( request.message === "open_new_tab" ) {
+//       chrome.tabs.create({"url": request.url});
+//     }
+//   }
+// );
 
 chrome.browserAction.onClicked.addListener(function(tab) {
     console.log('HEARD CLICK EVENT ON BACKGROUND');
     var tab;
 
+    //when extension icon is clicked, query browser tabs for active url
     chrome.tabs.query({
         active: true,
         currentWindow: true
@@ -36,6 +37,8 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 
     });
 
+    // makes api call to /api/get-web to run background web crawler
+    // tried to get front-end caching to work, but it doesn't
     function getTreeData (url, successCB, errorCB) {
         var urlWithoutSpecialChars = url.replace(/[^a-zA-Z0-9 ]/g, "");
         var cache;
@@ -74,6 +77,8 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 
     };
 
+    // pass message from browser to content script that contains
+    // the json data received from the api call
     function successHandler(response) {
         console.log("SUCCESS HANDLER: ", response);
         chrome.tabs.query({

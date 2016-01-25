@@ -2,6 +2,7 @@ var Promise = require('bluebird');
 var _ = require('lodash');
 var getObjectData = require('./scripts/objectFromUrl.js');
 var fs = require('fs');
+var urlParser = require('url').parse;
 //var linkParser = require('./scripts/linkParser.js');
 /*
 
@@ -51,10 +52,11 @@ UrlNode.prototype.prettyPrint = function()
 UrlNode.prototype.removeLeafChildren = function() {
 
     var removeLeafChildren = function (node) {
+        //create shortUrl property
+        node.shortUrl = urlParser(node.url).host;
+        var children = node.childNodes;
         //recursively go through all nodes
         //if node has empty childNode array, delete the childNode property altogether
-
-        var children = node.childNodes;
 
         if(children.length === 0) {
             delete node.childNodes;
