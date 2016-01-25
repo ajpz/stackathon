@@ -8,10 +8,11 @@ chrome.runtime.onMessage.addListener(
         // var redirect = "http://localhost:1337/home";
         // chrome.runtime.sendMessage({"message": "open_new_tab", "url": redirect});
         drawTree(request.root);
-
+        var cloudTip;
         function drawTree (root) {
 
             console.log('D3 SCRIPT IS RUNNING');
+
 
             // Helper function that creates the radial tree
             // receives the data-structure, "root"
@@ -36,12 +37,12 @@ chrome.runtime.onMessage.addListener(
                 node.append("circle")
                     .attr("r", 4.5)
                     .on("mouseover", function(d) {
-                        console.log(d);
+                        console.log(cloudTip);
                         calculateCloud(d.words);
-                        tooltip.style('display', 'block');
+                        cloudTip.style('display', 'block');
                     })
                     .on("mouseout", function(d) {
-                        tooltip.style('display', 'none');
+                        // cloudTip.style('display', 'none');
                         d3.select('#curTip').remove();
                     });
 
@@ -50,6 +51,7 @@ chrome.runtime.onMessage.addListener(
                     .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
                     .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
                     .text(function(d) { return d.shortUrl; });
+
             };
 
             //This code builds the DOM-modal using jquery-ui dialog module
@@ -78,7 +80,10 @@ chrome.runtime.onMessage.addListener(
                 }
             })
 
-
+            // Define 'div' for tooltips
+            cloudTip = d3.select("#dialog")
+                .append("div")  // declare the tooltip div
+                .attr("id", "tooltip")
 
             //basic D3 tree configuration
             var diameter = 800;

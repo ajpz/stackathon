@@ -1,9 +1,6 @@
 //WORD CLOUD:
 //https://www.pubnub.com/blog/2014-10-09-quick-word-cloud-from-a-chatroom-with-d3js/
-// Define 'div' for tooltips
-var tooltip = d3.select("body")
-    .append("div")  // declare the tooltip div
-    .attr("id", "tooltip")
+
 
   //var typeFace = 'Gorditas';
 var minFontSize = 40;
@@ -23,7 +20,7 @@ function drawCloud(words) {
     .enter().append('text')
     .style('font-size', function(d) {
         console.log(d);
-     return d.size*3 + 'px'; }) //adjust text size with multiplier
+     return d.size*6 + 'px'; }) //adjust text size with multiplier
     // .style('font-family', function(d) { return d.font; })
     .style('fill', function(d, i) { return colors(i); })
     .attr('text-anchor', 'middle')

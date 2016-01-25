@@ -159,7 +159,7 @@ module.exports = function(url) {
     })
     .then(function(headNode) {
         headNode.removeLeafChildren();
-        console.log("DIRECTORY: ", __dirname)
+        console.log("DIRECTORY: ", __dirname, headNode)
         //fs.writeFileSync('./public/data/route-generated.json', JSON.stringify(headNode));
         return headNode;
     })
