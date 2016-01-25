@@ -1,6 +1,5 @@
 //WORD CLOUD:
 //https://www.pubnub.com/blog/2014-10-09-quick-word-cloud-from-a-chatroom-with-d3js/
-  /* D3  */
 // Define 'div' for tooltips
 var tooltip = d3.select("body")
     .append("div")  // declare the tooltip div

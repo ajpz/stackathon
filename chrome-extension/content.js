@@ -58,7 +58,6 @@ chrome.runtime.onMessage.addListener(
             layerNode.setAttribute('title', 'View your neighbors!');
 
             var pNode = document.createElement('p');
-            console.log("pNode created");
             pNode.innerHTML = "This site has is part of an interesting network.";
 
             layerNode.appendChild(pNode);
