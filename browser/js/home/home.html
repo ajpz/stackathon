@@ -1,6 +1,32 @@
-<section id="home">
-  <p>ON HOME PAGE</p>
+<!-- <section id="home">
   <input type="text" class="form-control" ng-model="url" placeholder="enter url here">
   <button ng-click="makeTree()">Create Radial Tree</button>
-  <button ng-click="drawTree()">Draw the existing tree</button>
+
+  <div ng-show="hittingAPI()" class="cssload-content">
+      <div>
+          <div class="cssload-l1"></div>
+          <div class="cssload-l2"></div>
+          <div class="cssload-l3"></div>
+      </div>
+  </div>
+
+</section> -->
+
+<section id="home" class="container">
+  <form class="form-inline">
+    <div class="form-group">
+      <label for="url">Enter url here: </label>
+      <input type="text" class="form-control" id="url" placeholder="enter url here" ng-model="url">
+    </div>
+    <button ng-click="makeTree()" class="btn btn-default">Find neighbors!</button>
+  </form>
+
+  <div ng-show="hittingAPI()" class="cssload-content">
+    <div>
+        <div class="cssload-l1"></div>
+        <div class="cssload-l2"></div>
+        <div class="cssload-l3"></div>
+    </div>
+  </div>
+
 </section>

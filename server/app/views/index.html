@@ -14,6 +14,9 @@
     <script src="/socket.io-client/socket.io.js"></script>
     <script src="/main.js"></script>
     <script src="d3.min.js"></script>
+    <script src="d3.layout.cloud.js"></script>
+    <script src="tooltip.js"></script>
+
     <!-- style for D3 tree -->
     <style>
 
@@ -33,10 +36,22 @@
           stroke-width: 1.5px;
         }
 
+        #tooltip {
+          position: absolute;
+          background: gray;
+          opacity: 0.9;
+        /*  z-index: 10;*/
+          display: none;
+          border-radius: 8px;
+          padding: 2px;
+          box-shadow:7px 7px 5px 0px rgba(50, 50, 50, 0.75);
+          float: right;
+        }
+
     </style>
 </head>
 <body ng-app="FullstackGeneratedApp">
-    <navbar></navbar>20
+    <!-- <navbar></navbar> -->
     <div id="main" ui-view></div>
 </body>
 </html>
