@@ -129,7 +129,8 @@ function calculateCloud(data) {
   d3.layout.cloud()
     .size([width*1.5, height*1.5])
     .words(data)
-    .rotate(function() { return ~~(Math.random()*2) * 90;}) // 0 or 90deg
+    .rotate(function() { return ~~(Math.random()*2) * 90;
+    }) // 0 or 90deg
     .fontSize(function(d) { return d.size; })
     .on('end', drawCloud)
     .start();

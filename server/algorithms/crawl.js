@@ -29,7 +29,7 @@ function UrlNode(url, depth) { //removed 3rd param: parentNode to try and limit 
     this.depth = depth;
     this.url = url;
     // this.parentNode = parentNode || null;
-    this.keywords = {};
+    this.words = [];
     this.childNodes = [];
 };
 
@@ -91,12 +91,13 @@ UrlNode.prototype.removeLeafChildren = function() {
 
 //might want to rewrite this to be breadth first, and then render level by level
 var crawlLinkRecursive = function(parentNode) {
-    //async: gets html from url and extracts keywords and childlinks
-    return getObjectData(parentNode.url, 10)
+    //async: gets html from url and extracts words and childlinks
+    return getObjectData(parentNode.url, 12)
     .then(function(urlData){
-        //console.log(urlData);
-        //now we have keywords and childurls for this node.
-        parentNode.keywords = urlData.keywords;
+        console.log('CRAWL GOT DATA');
+        console.log(urlData);
+        //now we have words and childurls for this node.
+        parentNode.words = urlData.words;
         parentNode.title = urlData.title;
         //then, for each link, do the same
         if(urlData.childurls) {
@@ -154,7 +155,7 @@ module.exports = function(url) {
     .then(function(headNode) {
         headNode.removeLeafChildren();
         console.log("DIRECTORY: ", __dirname)
-        fs.writeFileSync('./public/data/route-generated.json', JSON.stringify(headNode));
+        //fs.writeFileSync('./public/data/route-generated.json', JSON.stringify(headNode));
         return headNode;
     })
 }

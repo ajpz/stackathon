@@ -8,6 +8,7 @@
 */
 var contentToArray = require('./contentCleaner');
 var textFromHtml = require('./contentParser');
+var titleFromHtml = require('./titleParser');
 var linksFromHtml = require('./linkParser');
 var getHtml = require('./getHtml');
 
@@ -15,15 +16,17 @@ var getHtml = require('./getHtml');
 var grabAndParseUrl = function(url, maxNumKeyWords) {
     return getHtml(url).then(function(htmlObj){
         var text = textFromHtml(htmlObj.html);
-        var title = textFromHtml(htmlObj.html);
+        var title = titleFromHtml(htmlObj.html);
+        console.log("title", title);
         var linksArr = linksFromHtml(htmlObj);
         var formattedContent = contentToArray(text, maxNumKeyWords);
-        //console.log("GOOD");
-        return Promise.resolve({keywords: formattedContent, childurls: linksArr, title: title});
+        console.log("GOOD");
+        contentToArray.log(formattedContent);
+        return Promise.resolve({words: formattedContent, childurls: linksArr, title: title});
     }).catch(function(err){
-        //console.log('BAD');
+        console.log('BAD');
         //catch error here and return empty obj to crawl function
-        return Promise.resolve({keywords: {}, childurls: []});
+        return Promise.resolve({words: [], childurls: []});
     })
 }
 

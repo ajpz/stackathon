@@ -38,6 +38,17 @@
       stroke-width: 1.5px;
     }
 
+    #tooltip {
+      position: absolute;
+      background: white;
+      opacity: 0.9;
+      z-index: 10;
+      display: none;
+      border-radius: 8px;
+      padding: 2px;
+      box-shadow:7px 7px 5px 0px rgba(50, 50, 50, 0.75);
+    }
+
     </style>
 
     <!--
@@ -47,6 +58,8 @@
 - [1]: https://developer.chrome.com/extensions/contentSecurityPolicy
 -->
     <script src="d3.min.js"></script>
+    <script src="d3.layout.cloud.js"></script>
+    <script src="wordcloud.js"></script>
     <script src="popup.js"></script>
 </head>
 
